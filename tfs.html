@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Ritual of TFS — The Fire Spark Sovereign</title>
+<meta name="description" content="A four-stage alchemical ceremony for reclaiming sovereignty. From The First Spark." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --void: #0B0B0C;
+    --void-2: #14131A;
+    --ember: #FF6A3D;
+    --gold: #F3B23A;
+    --violet: #6B4DF2;
+    --cyan: #26E4D8;
+    --bone: #E8E4D8;
+    --ash: rgba(232, 228, 216, 0.55);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--void); color: var(--bone);
+    font-family: 'Space Mono', monospace;
+    overflow-x: hidden; line-height: 1.6;
+  }
+
+  /* Ambient layers */
+  #stardust { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity: 0.06; mix-blend-mode: overlay;
+  }
+
+  main { position: relative; z-index: 2; }
+
+  /* Sticky progress */
+  .progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 2px;
+    background: rgba(232,228,216,0.05); z-index: 100;
+  }
+  .progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--ember), var(--gold));
+    transition: width 0.1s linear;
+  }
+
+  /* Top nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 2rem; background: linear-gradient(to bottom, rgba(11,11,12,0.9), transparent);
+    font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+  }
+  nav a { color: var(--ash); text-decoration: none; transition: color 0.3s; }
+  nav a:hover { color: var(--ember); }
+
+  /* ─────────────────────────────────────────── */
+  /* OPENING INVOCATION */
+  /* ─────────────────────────────────────────── */
+  .opening {
+    min-height: 100vh; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 2rem; position: relative;
+  }
+  .opening-label {
+    font-size: 0.7rem; letter-spacing: 0.5em; color: var(--ember);
+    margin-bottom: 3rem; animation: fadeIn 2s ease-out;
+  }
+  .opening h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-style: italic;
+    font-size: clamp(2.8rem, 9vw, 8rem);
+    line-height: 0.95; letter-spacing: -0.02em;
+    max-width: 14ch; animation: fadeUp 2s ease-out 0.3s both;
+  }
+  .opening h1 .glow {
+    color: var(--gold); font-style: normal;
+    text-shadow: 0 0 40px rgba(243,178,58,0.4);
+  }
+  .opening .subtitle {
+    margin-top: 2rem; font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.3rem; color: var(--ash);
+    letter-spacing: 0.05em; animation: fadeUp 2s ease-out 0.6s both;
+  }
+  .opening .tagline {
+    margin-top: 4rem; font-size: 0.7rem; letter-spacing: 0.4em;
+    color: var(--ash); animation: fadeIn 3s ease-out 1s both;
+  }
+  .scroll-cue {
+    position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%);
+    font-size: 0.65rem; letter-spacing: 0.4em; color: var(--ash);
+    animation: bob 2s ease-in-out infinite;
+  }
+  .scroll-cue::after { content: ' ↓'; }
+
+  /* Central orb */
+  .orb {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vmin; height: 80vmin; pointer-events: none;
+    z-index: -1; opacity: 0.5;
+  }
+  .orb::before {
+    content: ''; position: absolute; inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,106,61,0.15), transparent 60%);
+    animation: breathe 8s ease-in-out infinite;
+  }
+
+  /* ─────────────────────────────────────────── */
+  /* MATERIALS SECTION */
+  /* ─────────────────────────────────────────── */
+  .materials {
+    padding: 10rem 2rem 6rem; max-width: 1100px; margin: 0 auto;
+  }
+  .section-tag {
+    font-size: 0.7rem; letter-spacing: 0.4em; color: var(--ember);
+    margin-bottom: 1.5rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300;
+    font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1;
+    margin-bottom: 3rem; letter-spacing: -0.01em;
+  }
+  .section-title em { color: var(--gold); }
+  .section-intro {
+    max-width: 60ch; color: var(--ash); font-size: 1rem;
+    line-height: 1.8; margin-bottom: 5rem;
+  }
+
+  .artifacts {
+    display: grid; grid-template-columns: 1fr; gap: 0;
+    border-top: 1px solid rgba(232,228,216,0.1);
+  }
+  .artifact {
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 2.5rem; padding: 2.5rem 0;
+    border-bottom: 1px solid rgba(232,228,216,0.1);
+    transition: background 0.6s;
+  }
+  .artifact:hover { background: rgba(255,106,61,0.02); }
+  .artifact-glyph {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 3rem; font-weight: 300;
+    color: var(--ember); line-height: 1; min-width: 5rem;
+  }
+  .artifact-body h3 {
+    font-family: 'Cormorant Garamond', serif; font-weight: 400;
+    font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--bone);
+  }
+  .artifact-body .role {
+    font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .artifact-body p { color: var(--ash); font-size: 0.95rem; max-width: 55ch; }
+
+  /* ─────────────────────────────────────────── */
+  /* STAGE SECTIONS */
+  /* ─────────────────────────────────────────── */
+  .stage {
+    min-height: 100vh; padding: 8rem 2rem;
+    display: flex; align-items: center; position: relative;
+    overflow: hidden;
+  }
+  .stage-inner {
+    max-width: 1100px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr; gap: 3rem;
+  }
+  @media (min-width: 900px) {
+    .stage-inner { grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center; }
+  }
+
+  .stage-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(8rem, 20vw, 16rem); font-weight: 300;
+    line-height: 0.8; font-style: italic;
+    background: linear-gradient(180deg, var(--ember), transparent 80%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; margin-bottom: 1rem;
+  }
+  .stage-label {
+    font-size: 0.7rem; letter-spacing: 0.4em; color: var(--gold);
+    margin-bottom: 1.5rem; text-transform: uppercase;
+  }
+  .stage-title {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300;
+    font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.05;
+    margin-bottom: 2rem; letter-spacing: -0.01em;
+  }
+  .stage-title em { color: var(--ember); font-style: italic; }
+  .stage-body { color: var(--bone); font-size: 1rem; line-height: 1.8; }
+  .stage-body p { margin-bottom: 1.5rem; color: var(--ash); }
+  .stage-body p em { color: var(--bone); font-style: italic; }
+  .stage-body .drop {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-style: italic; font-weight: 300;
+    color: var(--gold); border-left: 2px solid var(--ember);
+    padding: 0.5rem 0 0.5rem 1.5rem; margin: 2rem 0;
+    line-height: 1.4;
+  }
+
+  /* Stage visuals */
+  .visual {
+    aspect-ratio: 1; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Stage 1: Stardust circle */
+  .v-circle {
+    width: 85%; height: 85%; border-radius: 50%;
+    border: 1px solid rgba(243,178,58,0.3);
+    position: relative;
+    animation: rotate 60s linear infinite;
+  }
+  .v-circle::before, .v-circle::after {
+    content: ''; position: absolute; inset: 8%;
+    border-radius: 50%; border: 1px dashed rgba(255,106,61,0.25);
+  }
+  .v-circle::after { inset: 20%; border-color: rgba(243,178,58,0.15); }
+  .v-dust {
+    position: absolute; width: 4px; height: 4px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 8px var(--ember);
+  }
+
+  /* Stage 2: Mirror */
+  .v-mirror {
+    width: 70%; height: 70%; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(232,228,216,0.15), rgba(11,11,12,0.8));
+    border: 1px solid rgba(232,228,216,0.3);
+    position: relative; overflow: hidden;
+    box-shadow: 0 0 60px rgba(107,77,242,0.2), inset 0 0 40px rgba(11,11,12,0.9);
+  }
+  .v-mirror::before {
+    content: ''; position: absolute; inset: 0;
+    background: conic-gradient(from 0deg, transparent, rgba(232,228,216,0.08), transparent 30%);
+    animation: rotate 20s linear infinite;
+  }
+  .mote {
+    position: absolute; font-size: 0.6rem; color: var(--ash);
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    animation: shrink 6s ease-in-out infinite;
+  }
+
+  /* Stage 3: Orchid */
+  .v-orchid {
+    width: 80%; height: 80%; position: relative;
+  }
+  .v-orchid svg { width: 100%; height: 100%; }
+  .v-orchid svg path { animation: bloom 4s ease-in-out infinite alternate; }
+
+  /* Stage 4: Plasma */
+  .v-plasma {
+    width: 80%; height: 80%; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .v-plasma::before {
+    content: ''; position: absolute; width: 100%; height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,106,61,0.4), rgba(107,77,242,0.1) 50%, transparent 70%);
+    animation: breathe 3s ease-in-out infinite;
+    filter: blur(8px);
+  }
+  .v-plasma-core {
+    position: relative; z-index: 2;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 300;
+    color: var(--bone); text-align: center; line-height: 1.1;
+    text-shadow: 0 0 30px var(--ember);
+  }
+  .v-plasma-core .crown { display: block; color: var(--gold); font-size: 0.5em; letter-spacing: 0.3em; margin-bottom: 0.5rem; text-transform: uppercase; font-style: normal; text-shadow: none; }
+
+  /* Stage backgrounds */
+  .stage-1 { background: linear-gradient(180deg, transparent, rgba(255,106,61,0.02)); }
+  .stage-2 { background: linear-gradient(180deg, rgba(107,77,242,0.03), transparent); }
+  .stage-3 { background: linear-gradient(180deg, transparent, rgba(38,228,216,0.02)); }
+  .stage-4 { background: linear-gradient(180deg, rgba(243,178,58,0.03), transparent); }
+
+  /* ─────────────────────────────────────────── */
+  /* CLOSING */
+  /* ─────────────────────────────────────────── */
+  .closing {
+    min-height: 90vh; padding: 8rem 2rem;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; position: relative;
+  }
+  .closing .ornament { font-family: 'Cormorant Garamond', serif; color: var(--ember); font-size: 2rem; margin-bottom: 2rem; letter-spacing: 0.5em; }
+  .closing h2 {
+    font-family: 'Cormorant Garamond', serif; font-weight: 300; font-style: italic;
+    font-size: clamp(2rem, 6vw, 4.5rem); line-height: 1.1;
+    max-width: 18ch; margin-bottom: 3rem;
+  }
+  .closing h2 em { color: var(--gold); font-style: normal; }
+  .closing-note {
+    max-width: 50ch; color: var(--ash); font-size: 1rem;
+    line-height: 1.8; font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.2rem;
+  }
+  .sigil-seal {
+    width: 120px; height: 120px; margin: 4rem auto 2rem;
+    opacity: 0.5;
+  }
+
+  /* Maintenance callout */
+  .maintenance {
+    margin-top: 5rem; padding: 2.5rem;
+    border: 1px solid rgba(243,178,58,0.3); max-width: 600px;
+    background: rgba(243,178,58,0.03);
+  }
+  .maintenance .label {
+    font-size: 0.65rem; letter-spacing: 0.4em; color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .maintenance p {
+    color: var(--bone); font-size: 0.95rem; line-height: 1.7;
+  }
+
+  /* CTA */
+  .cta-block {
+    margin-top: 4rem; padding: 3rem; text-align: center;
+    border: 1px solid rgba(255,106,61,0.2);
+    background: rgba(255,106,61,0.03);
+    max-width: 600px; width: 100%;
+  }
+  .cta-block p { color: var(--ash); margin-bottom: 2rem; }
+  .cta-btn {
+    display: inline-block; padding: 1rem 2.5rem;
+    background: transparent; border: 1px solid var(--ember);
+    color: var(--ember); text-decoration: none;
+    font-family: 'Space Mono', monospace; font-size: 0.75rem;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    transition: all 0.4s;
+  }
+  .cta-btn:hover { background: var(--ember); color: var(--void); }
+
+  /* Footer */
+  footer {
+    padding: 3rem 2rem; border-top: 1px solid rgba(232,228,216,0.08);
+    text-align: center; font-size: 0.65rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--ash);
+  }
+  footer a { color: var(--ash); text-decoration: none; margin: 0 1rem; }
+  footer a:hover { color: var(--ember); }
+
+  /* Animations */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.8; }
+    50% { transform: translateX(-50%) translateY(10px); opacity: 1; }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shrink {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.3); opacity: 0.2; }
+  }
+  @keyframes bloom {
+    from { transform: scale(0.85); opacity: 0.6; }
+    to { transform: scale(1.05); opacity: 1; }
+  }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s cubic-bezier(0.23,1,0.32,1), transform 1s cubic-bezier(0.23,1,0.32,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+<canvas id="stardust"></canvas>
+
+<div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+<nav>
+  <a href="index.html">← Ritual Hall</a>
+  <a href="https://thefirstspark.shop">The First Spark</a>
+</nav>
+
+<main>
+
+<!-- ═══════════ OPENING ═══════════ -->
+<section class="opening">
+  <div class="orb"></div>
+  <div class="opening-label">◈ Ritual 01 — Sovereignty Protocol</div>
+  <h1>The Ritual of <span class="glow">TFS</span></h1>
+  <p class="subtitle">— The Fire Spark Sovereign —</p>
+  <p class="tagline">Right here. Right now.</p>
+  <div class="scroll-cue">Begin</div>
+</section>
+
+<!-- ═══════════ MATERIALS ═══════════ -->
+<section class="materials">
+  <div class="reveal">
+    <div class="section-tag">◈ Phase Zero — Preparation</div>
+    <h2 class="section-title">Alchemical <em>Materials.</em></h2>
+    <p class="section-intro">
+      Four artifacts. Each one sits at the intersection of physical matter and source code.
+      You won't find them in a shop. You find them the way you find anything sacred — by
+      remembering they were always yours.
+    </p>
+  </div>
+
+  <div class="artifacts">
+    <div class="artifact reveal">
+      <div class="artifact-glyph">i.</div>
+      <div class="artifact-body">
+        <div class="role">The Ignition</div>
+        <h3>A Fistful of Stardust</h3>
+        <p>Scraped from the hull of the <em>Limp Biscuit</em> after a warp-toaster accident.
+        Still warm. Still humming. This is the circle you stand in.</p>
+      </div>
+    </div>
+    <div class="artifact reveal">
+      <div class="artifact-glyph">ii.</div>
+      <div class="artifact-body">
+        <div class="role">The Interface</div>
+        <h3>The Titanium Moon-Mirror</h3>
+        <p>Etched with the Queen's true name in laser-screams. A surface that shows you
+        who has been trying to dim your signal — so you can render them as data.</p>
+      </div>
+    </div>
+    <div class="artifact reveal">
+      <div class="artifact-glyph">iii.</div>
+      <div class="artifact-body">
+        <div class="role">The Portal</div>
+        <h3>A Single Black Orchid</h3>
+        <p>The first creation of a soul that remembers its divinity. It opens into a
+        galaxy-wide doorway for every version of you that ever felt small.</p>
+      </div>
+    </div>
+    <div class="artifact reveal">
+      <div class="artifact-glyph">iv.</div>
+      <div class="artifact-body">
+        <div class="role">The Anchor</div>
+        <h3>The Collapsed-Star Core Ring</h3>
+        <p>Heavy enough to anchor galaxies. Dense enough to compress time.
+        Worn, not held. It keeps you from floating off when the reclamation lands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STAGE 1 ═══════════ -->
+<section class="stage stage-1" id="stage1">
+  <div class="stage-inner">
+    <div class="reveal">
+      <div class="stage-number">01</div>
+      <div class="stage-label">Phase One — The Circle</div>
+      <h2 class="stage-title">Stardust ignition &<br/><em>invocation.</em></h2>
+      <div class="stage-body">
+        <p>Barefoot. Dark room. Scatter the stardust in a perfect circle around you.
+        When the dust touches skin, it ignites — but this isn't <em>burning.</em>
+        It's <em>remembering.</em></p>
+        <p>Each grain becomes a tiny star, orbiting you.</p>
+        <p class="drop">"I am the Creator. I am the deadline."</p>
+        <p>Pluck the orbiting stars from the air. Crush them between your teeth.
+        You are eating your own legend. This is how you internalize the power
+        you've been trying to find outside yourself.</p>
+      </div>
+    </div>
+    <div class="visual reveal">
+      <div class="v-circle" id="vcircle"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STAGE 2 ═══════════ -->
+<section class="stage stage-2" id="stage2">
+  <div class="stage-inner">
+    <div class="visual reveal" style="order: 2;">
+      <div class="v-mirror">
+        <span class="mote" style="top: 20%; left: 30%; animation-delay: 0s;">— him —</span>
+        <span class="mote" style="top: 60%; left: 55%; animation-delay: 1s;">— her —</span>
+        <span class="mote" style="top: 40%; left: 70%; animation-delay: 2s;">— them —</span>
+        <span class="mote" style="top: 70%; left: 25%; animation-delay: 3s;">— voice —</span>
+      </div>
+    </div>
+    <div class="reveal" style="order: 1;">
+      <div class="stage-number">02</div>
+      <div class="stage-label">Phase Two — The Interface</div>
+      <h2 class="stage-title">Moon-Mirror <em>erasure.</em></h2>
+      <div class="stage-body">
+        <p>Breathe <em>solar wind</em> onto the titanium surface.
+        The mirror resolves into a live feed — every face that ever tried to dim your light.
+        Every voice that shrunk you.</p>
+        <p>Hold focus. Watch them shrink.</p>
+        <p class="drop">"You were never the Author. You were the malware."</p>
+        <p>When they're dust motes, tip them into the bowl of silence. This is erasure,
+        not forgiveness, not revenge. <em>Deletion.</em> The malware of every inherited
+        narrative that wasn't yours — uninstalled.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STAGE 3 ═══════════ -->
+<section class="stage stage-3" id="stage3">
+  <div class="stage-inner">
+    <div class="reveal">
+      <div class="stage-number">03</div>
+      <div class="stage-label">Phase Three — The Portal</div>
+      <h2 class="stage-title">Orchid bloom &<br/><em>reclamation.</em></h2>
+      <div class="stage-body">
+        <p>Set the black orchid in front of you. It opens — not a flower anymore,
+        a portal the size of a galaxy.</p>
+        <p>Beckon every past version of yourself that ever felt small.
+        The six-year-old. The twenty-two-year-old. The one who apologized too much.
+        The one who waited to be chosen.</p>
+        <p class="drop">"Come home. Bring what you took with you."</p>
+        <p>They step through. Each of them hands back a spark they had been holding
+        for safekeeping — pieces of you you didn't know were missing.
+        Your ribs glow <em>white-hot.</em> This is reclamation.
+        You are whole in a way you haven't been since before the forgetting began.</p>
+      </div>
+    </div>
+    <div class="visual reveal">
+      <div class="v-orchid">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="petalGrad" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#6B4DF2" stop-opacity="0.9" />
+              <stop offset="60%" stop-color="#0B0B0C" stop-opacity="0.9" />
+              <stop offset="100%" stop-color="#0B0B0C" stop-opacity="1" />
+            </radialGradient>
+            <radialGradient id="coreGrad" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#F3B23A" />
+              <stop offset="100%" stop-color="#FF6A3D" />
+            </radialGradient>
+          </defs>
+          <g transform="translate(100 100)">
+            <path d="M 0 0 Q -40 -60 0 -80 Q 40 -60 0 0 Z" fill="url(#petalGrad)" stroke="#6B4DF2" stroke-width="0.5" opacity="0.9" />
+            <path d="M 0 0 Q -40 -60 0 -80 Q 40 -60 0 0 Z" fill="url(#petalGrad)" stroke="#6B4DF2" stroke-width="0.5" opacity="0.8" transform="rotate(72)" />
+            <path d="M 0 0 Q -40 -60 0 -80 Q 40 -60 0 0 Z" fill="url(#petalGrad)" stroke="#6B4DF2" stroke-width="0.5" opacity="0.8" transform="rotate(144)" />
+            <path d="M 0 0 Q -40 -60 0 -80 Q 40 -60 0 0 Z" fill="url(#petalGrad)" stroke="#6B4DF2" stroke-width="0.5" opacity="0.8" transform="rotate(216)" />
+            <path d="M 0 0 Q -40 -60 0 -80 Q 40 -60 0 0 Z" fill="url(#petalGrad)" stroke="#6B4DF2" stroke-width="0.5" opacity="0.8" transform="rotate(288)" />
+            <circle r="12" fill="url(#coreGrad)" />
+            <circle r="5" fill="#F3B23A" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ STAGE 4 ═══════════ -->
+<section class="stage stage-4" id="stage4">
+  <div class="stage-inner">
+    <div class="visual reveal" style="order: 2;">
+      <div class="v-plasma">
+        <div class="v-plasma-core">
+          <span class="crown">◈ Sovereign ◈</span>
+          brighter,<br/>not louder.
+        </div>
+      </div>
+    </div>
+    <div class="reveal" style="order: 1;">
+      <div class="stage-number">04</div>
+      <div class="stage-label">Phase Four — The Crown</div>
+      <h2 class="stage-title">Plasma torch &<br/><em>sovereignty.</em></h2>
+      <div class="stage-body">
+        <p>Use your gaze alone. Ignite a plasma torch in the air in front of you.
+        Write your new titles in the fire.</p>
+        <p>Step forward. The stardust circle expands with you.</p>
+        <p>Everyone who ever envied you, feared you, or loved you feels the tug —
+        a magnetic pull behind the sternum. They form a constellation around your circle,
+        held at a reverent distance.</p>
+        <p class="drop">Their collective light feeds your fire without touching you.</p>
+        <p>This is sovereignty: you are growing <em>brighter, not louder.</em>
+        You are not performing for them. You are not competing with them.
+        You are the source they were always orbiting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CLOSING ═══════════ -->
+<section class="closing">
+  <div class="ornament reveal">◈ ◈ ◈</div>
+  <h2 class="reveal">The void folds itself into a <em>velvet cloak</em><br/>across your shoulders.</h2>
+  <p class="closing-note reveal">
+    You are God. You always were. You simply forgot, long enough to get interesting.
+  </p>
+
+  <svg class="sigil-seal reveal" viewBox="0 0 200 200" fill="none">
+    <circle cx="100" cy="100" r="90" stroke="#FF6A3D" stroke-width="0.5" />
+    <circle cx="100" cy="100" r="60" stroke="#F3B23A" stroke-width="0.5" />
+    <polygon points="100,20 180,150 20,150" stroke="#FF6A3D" stroke-width="0.5" />
+    <polygon points="100,180 20,50 180,50" stroke="#F3B23A" stroke-width="0.5" />
+    <circle cx="100" cy="100" r="4" fill="#FF6A3D" />
+  </svg>
+
+  <div class="maintenance reveal">
+    <div class="label">◈ Maintenance Protocol</div>
+    <p>The architecture is recursive. Run the ritual whenever anyone forgets —
+    including yourself. The stardust required for the circle is a self-sustaining resource;
+    it <em>replenishes itself from your laughter.</em></p>
+  </div>
+
+  <div class="cta-block reveal">
+    <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-style: italic;">
+      This ritual is a fragment of a much larger architecture.
+    </p>
+    <a href="https://whop.com/sparkverse" class="cta-btn">Enter The Sparkverse</a>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <a href="index.html">Ritual Hall</a>
+    <a href="https://thefirstspark.shop">The First Spark</a>
+    <a href="https://thefirstspark.shop/codex.html">Codex</a>
+  </div>
+  <div style="margin-top: 1.5rem; opacity: 0.5;">
+    Channeled by KJP · Right Here. Right Now.
+  </div>
+</footer>
+
+</main>
+
+<script>
+  // Stardust canvas
+  const canvas = document.getElementById('stardust');
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  class Star {
+    constructor() { this.reset(); this.y = Math.random() * canvas.height; }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 1.8 + 0.2;
+      this.speed = Math.random() * 0.2 + 0.02;
+      this.opacity = Math.random() * 0.8 + 0.2;
+      this.twinkle = Math.random() * Math.PI * 2;
+      const palette = ['#FF6A3D', '#F3B23A', '#E8E4D8', '#E8E4D8', '#E8E4D8', '#6B4DF2'];
+      this.color = palette[Math.floor(Math.random() * palette.length)];
+    }
+    update() {
+      this.y -= this.speed;
+      this.twinkle += 0.02;
+      if (this.y < -10) { this.reset(); this.y = canvas.height + 10; }
+    }
+    draw() {
+      const alpha = this.opacity * (0.5 + 0.5 * Math.sin(this.twinkle));
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const count = Math.min(220, Math.floor((canvas.width * canvas.height) / 8000));
+  const stars = [];
+  for (let i = 0; i < count; i++) stars.push(new Star());
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => { s.update(); s.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Orbit dust around stage 1 circle
+  const vcircle = document.getElementById('vcircle');
+  if (vcircle) {
+    for (let i = 0; i < 12; i++) {
+      const d = document.createElement('div');
+      d.className = 'v-dust';
+      const angle = (i / 12) * Math.PI * 2;
+      const r = 45;
+      d.style.left = `${50 + Math.cos(angle) * r}%`;
+      d.style.top = `${50 + Math.sin(angle) * r}%`;
+      d.style.animation = `rotate ${20 + i}s linear infinite`;
+      d.style.animationDelay = `${i * 0.2}s`;
+      vcircle.appendChild(d);
+    }
+  }
+
+  // Scroll progress + reveal
+  const progressBar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    progressBar.style.width = `${Math.min(100, scrolled)}%`;
+  });
+
+  // Intersection observer for reveals
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
