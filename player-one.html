@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Player One — The Original Glitch</title>
+<meta name="description" content="The moment you step into your nervous system and become player one — the original glitch. A ceremonial protocol from The First Spark." />
+<meta name="theme-color" content="#08080a" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #08080a;
+    --fg: #eceae4;
+    --muted: #8e8c88;
+    --accent: #c5d0cc;
+    --accent-fg: #08080a;
+    --border: rgba(236, 234, 228, 0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: Outfit, ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  .stage { position: relative; height: 100dvh; width: 100%; overflow: hidden; background: var(--bg); }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  .layer { position: absolute; inset: 0; z-index: 20; }
+  .hidden { display: none !important; }
+  .nav {
+    position: absolute; top: 0; left: 0; z-index: 40;
+    padding: 1.1rem 1.25rem;
+    font-size: 0.68rem; letter-spacing: 0.28em; text-transform: uppercase;
+  }
+  .nav a { color: var(--muted); text-decoration: none; }
+  .nav a:hover { color: var(--fg); }
+  .mute {
+    position: absolute; top: 0.6rem; right: 0.75rem; z-index: 40;
+    width: 44px; height: 44px; border: 0; background: transparent; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mute:hover { color: var(--fg); }
+  .mute svg { width: 20px; height: 20px; }
+  .threshold {
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    overflow: hidden; background: var(--bg);
+  }
+  .threshold .field, .awaken .field {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.22; pointer-events: none;
+  }
+  .threshold .vessel {
+    position: absolute; inset-inline: 0; top: 6%; margin-inline: auto;
+    height: 72%; width: auto; max-width: min(92vw, 420px); object-fit: contain; opacity: 0.9; pointer-events: none;
+    animation: breathe 11s ease-in-out infinite;
+  }
+  .threshold .veil {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to bottom, rgba(8,8,10,0.2), transparent 40%, var(--bg));
+  }
+  .copy {
+    position: relative; z-index: 10; width: 100%; max-width: 36rem;
+    padding: 2rem 1.5rem max(1.5rem, env(safe-area-inset-bottom));
+    text-align: center;
+  }
+  .kicker {
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 1.1rem;
+  }
+  .poem {
+    font-family: "Instrument Serif", "Times New Roman", serif;
+    font-size: clamp(1.35rem, 1rem + 2.2vw, 2rem);
+    line-height: 1.28; text-wrap: balance;
+  }
+  .poem .accent { font-style: italic; color: var(--accent); }
+  .enter {
+    margin-top: 2rem; min-height: 44px; border: 0; background: transparent; color: var(--fg);
+    font: 500 0.72rem/1 Outfit, sans-serif; letter-spacing: 0.32em; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 0.75rem;
+  }
+  .enter span.line { display: block; height: 1px; width: 2rem; background: var(--accent); }
+  .hud-top {
+    position: absolute; inset-inline: 0; top: 0; z-index: 20; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1.5rem 0;
+    text-align: center;
+  }
+  .hud-top .hint {
+    margin-top: 0.7rem; font-family: "Instrument Serif", serif; font-size: 1.125rem; font-style: italic; color: rgba(236,234,228,0.9);
+  }
+  .hud-bot {
+    position: absolute; inset-inline: 0; bottom: 0; z-index: 20; pointer-events: none;
+    padding: 0 2rem max(1.5rem, env(safe-area-inset-bottom));
+  }
+  .bar { margin: 0 auto; height: 1px; width: 100%; max-width: 28rem; background: var(--border); }
+  .bar > i { display: block; height: 1px; width: 0; background: var(--accent); transition: width 500ms cubic-bezier(0.22,1,0.36,1); }
+  .hud-bot .free {
+    margin-top: 0.75rem; text-align: center; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted);
+  }
+  .glitch {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(8,8,10,0.3);
+  }
+  .glitch .scan {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.4; mix-blend-mode: screen;
+    background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 2px, rgba(8,8,10,0.55) 3px);
+    animation: tear 420ms steps(2, end) infinite;
+  }
+  .glitch p {
+    font-family: "Instrument Serif", serif; font-size: 1.25rem; font-style: italic; text-wrap: balance;
+    padding: 0 2rem; text-align: center;
+  }
+  .awaken { display: flex; flex-direction: column; background: var(--bg); }
+  .awaken .figure-wrap {
+    flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.5rem 0;
+  }
+  .awaken .figure {
+    height: min(52vh, 520px); width: auto; max-width: min(88vw, 360px); object-fit: contain;
+    animation: breathe 11s ease-in-out infinite;
+  }
+  .awaken .copy { max-width: 32rem; }
+  .seal {
+    width: 3.5rem; height: 3.5rem; border-radius: 999px; object-fit: cover; opacity: 0.85;
+    outline: 1px solid rgba(236,234,228,0.1); outline-offset: -1px; margin-bottom: 1rem;
+  }
+  .display {
+    margin-top: 0.7rem;
+    font-family: "Instrument Serif", serif;
+    font-size: clamp(2.4rem, 1.6rem + 4vw, 4.25rem);
+    line-height: 1.1; letter-spacing: -0.03em;
+  }
+  .sub { margin-top: 0.2rem; font-family: "Instrument Serif", serif; font-size: 1.125rem; font-style: italic; color: var(--accent); }
+  .manifesto {
+    margin-top: 1.25rem; max-width: 24rem; margin-inline: auto;
+    font-size: 0.9375rem; line-height: 1.55; color: var(--muted); text-wrap: pretty;
+  }
+  .actions {
+    margin-top: 2rem; display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 22rem; margin-inline: auto;
+  }
+  @media (min-width: 640px) { .actions { flex-direction: row; justify-content: center; } }
+  .btn {
+    min-height: 44px; flex: 1; border: 0; border-radius: 12px;
+    font: 500 0.9375rem/1 Outfit, sans-serif; padding: 0 1.25rem;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-fg); }
+  .btn-ghost { background: transparent; color: var(--fg); box-shadow: 0 0 0 1px rgba(236,234,228,0.1); }
+  .btn:active { transform: scale(0.96); }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.018); }
+  }
+  @keyframes tear {
+    0%, 100% { transform: translate(0,0); opacity: 0.28; }
+    20% { transform: translate(-6px,0); opacity: 0.5; }
+    42% { transform: translate(8px,1px); opacity: 0.22; }
+    68% { transform: translate(-3px,0); opacity: 0.45; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .threshold .vessel, .awaken .figure, .glitch .scan { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main class="stage" id="app">
+  <a class="nav" href="index.html">← Ritual Hall</a>
+  <button class="mute" id="mute" type="button" aria-label="Mute">
+    <svg id="iconOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8.5 8.5 0 0 1 0 12"/></svg>
+    <svg id="iconOff" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>
+  </button>
+
+  <div id="canvasWrap" class="hidden" style="position:absolute;inset:0;">
+    <canvas id="nervous" aria-label="Living nervous system"></canvas>
+  </div>
+
+  <div class="layer threshold" id="threshold">
+    <img class="field" src="art/field.jpg" alt="" />
+    <img class="vessel" src="art/vessel.jpg" alt="A standing human nervous system in the void" />
+    <div class="veil"></div>
+    <div class="copy">
+      <p class="kicker">Player One</p>
+      <h1 class="poem">
+        The moment you step into your nervous system<br />
+        <span class="accent">and become player one</span><br />
+        the original glitch.
+      </h1>
+      <button class="enter" id="enter" type="button">
+        <span class="line"></span>
+        <span id="enterLabel">Step in</span>
+        <span class="line"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="layer hidden" id="inhabitHud">
+    <div class="hud-top">
+      <p class="kicker">Step into your nervous system</p>
+      <p class="hint" id="hint">Touch the body to inhabit it</p>
+    </div>
+    <div class="hud-bot">
+      <div class="bar"><i id="bar"></i></div>
+      <p class="free hidden" id="freeLabel">Player One — original glitch</p>
+    </div>
+  </div>
+
+  <div class="layer glitch hidden" id="glitchVeil">
+    <div class="scan"></div>
+    <p>The signal splits.</p>
+  </div>
+
+  <div class="layer awaken hidden" id="awakening">
+    <img class="field" src="art/field.jpg" alt="" />
+    <div class="figure-wrap">
+      <img class="figure" src="art/awakened.jpg" alt="The nervous system ignited from within" />
+    </div>
+    <div class="copy">
+      <img class="seal" src="art/neuron.jpg" alt="" />
+      <p class="kicker">You are the signal</p>
+      <h2 class="display">Player One</h2>
+      <p class="sub">the original glitch</p>
+      <p class="manifesto">You were never a bug. You were the first signal that refused to settle. Sparked. Original. Still here.</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="remain" type="button">Remain</button>
+        <button class="btn btn-ghost" id="again" type="button">Once more</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const REGION_LABEL = {
+  brain: "Crown", spine: "Axis", heart: "Heart", solar: "Spark",
+  leftArm: "Left hand", rightArm: "Right hand", leftLeg: "Left path", rightLeg: "Right path",
+};
+const REGIONS = Object.keys(REGION_LABEL);
+const SAVE_KEY = "player-one:v1";
+const FG = { r: 236, g: 234, b: 228 };
+const ACC = { r: 197, g: 208, b: 204 };
+const GLOW = { r: 223, g: 232, b: 228 };
+const rgba = (c, a) => `rgba(${c.r},${c.g},${c.b},${a})`;
+
+function mulberry32(a) {
+  return () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function landmarks() {
+  const L = [
+    { x: 0.5, y: 0.09, region: "brain", core: true, r: 1.5 },
+    { x: 0.445, y: 0.105, region: "brain", r: 1.2 },
+    { x: 0.555, y: 0.105, region: "brain", r: 1.2 },
+    { x: 0.41, y: 0.13, region: "brain" }, { x: 0.59, y: 0.13, region: "brain" },
+    { x: 0.47, y: 0.145, region: "brain" }, { x: 0.53, y: 0.145, region: "brain" },
+    { x: 0.5, y: 0.165, region: "brain", core: true, r: 1.15 },
+    { x: 0.5, y: 0.195, region: "spine" }, { x: 0.5, y: 0.225, region: "spine" },
+    { x: 0.5, y: 0.255, region: "spine", core: true }, { x: 0.5, y: 0.29, region: "spine" },
+    { x: 0.5, y: 0.325, region: "spine" }, { x: 0.5, y: 0.36, region: "spine" },
+    { x: 0.5, y: 0.4, region: "spine" }, { x: 0.5, y: 0.44, region: "spine" },
+    { x: 0.5, y: 0.48, region: "spine", core: true }, { x: 0.5, y: 0.52, region: "spine" },
+    { x: 0.5, y: 0.555, region: "spine" },
+    { x: 0.465, y: 0.3, region: "heart", core: true, r: 1.55 },
+    { x: 0.49, y: 0.285, region: "heart" }, { x: 0.445, y: 0.32, region: "heart" },
+    { x: 0.5, y: 0.318, region: "heart" },
+    { x: 0.5, y: 0.375, region: "solar", core: true, r: 1.4 },
+    { x: 0.475, y: 0.39, region: "solar" }, { x: 0.525, y: 0.39, region: "solar" },
+    { x: 0.385, y: 0.25, region: "leftArm" }, { x: 0.34, y: 0.28, region: "leftArm" },
+    { x: 0.295, y: 0.33, region: "leftArm" }, { x: 0.255, y: 0.385, region: "leftArm" },
+    { x: 0.22, y: 0.445, region: "leftArm" }, { x: 0.19, y: 0.5, region: "leftArm" },
+    { x: 0.165, y: 0.545, region: "leftArm", core: true, r: 1.25 },
+    { x: 0.145, y: 0.575, region: "leftArm" }, { x: 0.13, y: 0.6, region: "leftArm" },
+    { x: 0.615, y: 0.25, region: "rightArm" }, { x: 0.66, y: 0.28, region: "rightArm" },
+    { x: 0.705, y: 0.33, region: "rightArm" }, { x: 0.745, y: 0.385, region: "rightArm" },
+    { x: 0.78, y: 0.445, region: "rightArm" }, { x: 0.81, y: 0.5, region: "rightArm" },
+    { x: 0.835, y: 0.545, region: "rightArm", core: true, r: 1.25 },
+    { x: 0.855, y: 0.575, region: "rightArm" }, { x: 0.87, y: 0.6, region: "rightArm" },
+    { x: 0.43, y: 0.57, region: "leftLeg" }, { x: 0.415, y: 0.62, region: "leftLeg" },
+    { x: 0.405, y: 0.68, region: "leftLeg" }, { x: 0.4, y: 0.74, region: "leftLeg" },
+    { x: 0.395, y: 0.8, region: "leftLeg" }, { x: 0.392, y: 0.86, region: "leftLeg" },
+    { x: 0.385, y: 0.915, region: "leftLeg", core: true, r: 1.2 }, { x: 0.36, y: 0.95, region: "leftLeg" },
+    { x: 0.57, y: 0.57, region: "rightLeg" }, { x: 0.585, y: 0.62, region: "rightLeg" },
+    { x: 0.595, y: 0.68, region: "rightLeg" }, { x: 0.6, y: 0.74, region: "rightLeg" },
+    { x: 0.605, y: 0.8, region: "rightLeg" }, { x: 0.608, y: 0.86, region: "rightLeg" },
+    { x: 0.615, y: 0.915, region: "rightLeg", core: true, r: 1.2 }, { x: 0.64, y: 0.95, region: "rightLeg" },
+  ];
+  const ribY = [0.27, 0.305, 0.34, 0.375, 0.41, 0.445];
+  const ribSpan = [0.07, 0.09, 0.1, 0.095, 0.085, 0.07];
+  ribY.forEach((y, i) => {
+    const s = ribSpan[i];
+    L.push({ x: 0.5 - s, y, region: "spine" });
+    L.push({ x: 0.5 + s, y, region: "spine" });
+    L.push({ x: 0.5 - s * 1.45, y: y + 0.008, region: "spine" });
+    L.push({ x: 0.5 + s * 1.45, y: y + 0.008, region: "spine" });
+  });
+  return L;
+}
+
+function addNode(nodes, lm, rnd, jitter) {
+  nodes.push({
+    x: lm.x + (rnd() - 0.5) * jitter,
+    y: lm.y + (rnd() - 0.5) * jitter * 0.7,
+    region: lm.region, core: Boolean(lm.core),
+    radius: lm.r || (lm.core ? 1.25 : 1), lit: 0, flash: 0, breath: rnd() * Math.PI * 2,
+  });
+  return nodes.length - 1;
+}
+function connect(edges, a, b, seen) {
+  if (a === b) return;
+  const key = a < b ? a + "-" + b : b + "-" + a;
+  if (seen.has(key)) return;
+  seen.add(key);
+  edges.push({ a, b, lit: 0 });
+}
+
+function createSystem(seed) {
+  const rnd = mulberry32(seed);
+  const nodes = []; const edges = []; const seen = new Set();
+  const marks = landmarks(); const ids = [];
+  for (const lm of marks) ids.push(addNode(nodes, lm, rnd, 0.006));
+  for (let i = 0; i < marks.length; i++) {
+    const extras = marks[i].core ? 3 : 1;
+    for (let k = 0; k < extras; k++) {
+      const sid = addNode(nodes, Object.assign({}, marks[i], { core: false, r: 0.7 }), rnd, 0.028);
+      connect(edges, ids[i], sid, seen);
+    }
+  }
+  const byRegion = new Map();
+  nodes.forEach((n, i) => { const list = byRegion.get(n.region) || []; list.push(i); byRegion.set(n.region, list); });
+  for (const list of byRegion.values()) {
+    const ordered = [...list].sort((a, b) => nodes[a].y - nodes[b].y || nodes[a].x - nodes[b].x);
+    for (let i = 0; i < ordered.length - 1; i++) {
+      const na = nodes[ordered[i]], nb = nodes[ordered[i + 1]];
+      const dx = na.x - nb.x, dy = na.y - nb.y;
+      if (dx * dx + dy * dy < 0.045) connect(edges, ordered[i], ordered[i + 1], seen);
+    }
+  }
+  const chain = (from, to) => { for (let i = from; i < to; i++) connect(edges, i, i + 1, seen); };
+  chain(8, 18); connect(edges, 7, 8, seen); connect(edges, 0, 7, seen);
+  connect(edges, 11, 19, seen); connect(edges, 19, 23, seen);
+  connect(edges, 10, 26, seen); connect(edges, 10, 35, seen);
+  connect(edges, 18, 44, seen); connect(edges, 18, 52, seen);
+  for (let i = 0; i < nodes.length; i++) {
+    let best = -1, bestD = 0.018;
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+      const d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = j; }
+    }
+    if (best >= 0) connect(edges, i, best, seen);
+  }
+  const motes = [];
+  for (let i = 0; i < 48; i++) motes.push({
+    x: 0.2 + rnd() * 0.6, y: 0.05 + rnd() * 0.9,
+    vx: (rnd() - 0.5) * 0.02, vy: (rnd() - 0.5) * 0.015,
+    life: 0.4 + rnd() * 0.6, max: 4 + rnd() * 6, size: 0.4 + rnd() * 0.8,
+  });
+  return { nodes, edges, sparks: [], motes, claimed: new Set(), trauma: 0 };
+}
+
+function neighbors(sys, index) {
+  const out = [];
+  for (const e of sys.edges) {
+    if (e.a === index) out.push(e.b);
+    else if (e.b === index) out.push(e.a);
+  }
+  return out;
+}
+function spawnSpark(sys, a, b, energy) {
+  if (energy < 0.16 || sys.sparks.length > 80) return;
+  sys.sparks.push({ a, b, t: 0, speed: 1.6 + energy * 1.4, energy });
+}
+function igniteNode(sys, index, energy) {
+  const node = sys.nodes[index]; if (!node) return;
+  node.lit = Math.min(1, node.lit + energy); node.flash = 1;
+  if (node.lit >= 0.5) sys.claimed.add(node.region);
+  sys.trauma = Math.min(1, sys.trauma + 0.18 * energy);
+  for (const n of neighbors(sys, index)) spawnSpark(sys, index, n, energy * 0.82);
+}
+function igniteAt(sys, x, y) {
+  let best = -1, bestD = 0.02;
+  for (let i = 0; i < sys.nodes.length; i++) {
+    const n = sys.nodes[i]; const dx = n.x - x, dy = n.y - y, d = dx * dx + dy * dy;
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  if (best < 0) return false;
+  igniteNode(sys, best, 1); return true;
+}
+function igniteAll(sys) {
+  for (const n of sys.nodes) { n.lit = 1; n.flash = 0.4; }
+  for (const e of sys.edges) e.lit = 1;
+  for (const r of REGIONS) sys.claimed.add(r);
+}
+function avgLit(sys) {
+  let s = 0; for (const n of sys.nodes) s += n.lit; return s / sys.nodes.length;
+}
+function presence(sys) { return Math.max(sys.claimed.size / REGIONS.length, avgLit(sys)); }
+function awakeningReady(sys) { return sys.claimed.size >= 5 || avgLit(sys) >= 0.48; }
+function sparkPos(sys, s) {
+  const a = sys.nodes[s.a], b = sys.nodes[s.b];
+  return { x: a.x + (b.x - a.x) * s.t, y: a.y + (b.y - a.y) * s.t };
+}
+function step(sys, dt) {
+  const cap = Math.min(dt, 0.1);
+  sys.trauma = Math.max(0, sys.trauma - cap * 1.4);
+  for (const n of sys.nodes) {
+    n.flash = Math.max(0, n.flash - cap * 2.4);
+    n.breath += cap * 1.1;
+    if (n.lit > 0 && n.lit < 1) n.lit = Math.min(1, n.lit + cap * 0.04);
+  }
+  for (const e of sys.edges) {
+    const target = (sys.nodes[e.a].lit + sys.nodes[e.b].lit) * 0.5;
+    e.lit += (target - e.lit) * (1 - Math.exp(-6 * cap));
+  }
+  for (let i = sys.sparks.length - 1; i >= 0; i--) {
+    const s = sys.sparks[i]; s.t += s.speed * cap;
+    if (s.t >= 1) { igniteNode(sys, s.b, s.energy * 0.82); sys.sparks.splice(i, 1); }
+  }
+  for (const m of sys.motes) {
+    m.x += m.vx * cap; m.y += m.vy * cap; m.life += cap;
+    if (m.x < 0.12 || m.x > 0.88) m.vx *= -1;
+    if (m.y < 0.04 || m.y > 0.98) m.vy *= -1;
+    if (m.life > m.max) { m.life = 0; m.x = 0.25 + Math.random() * 0.5; m.y = 0.08 + Math.random() * 0.84; }
+  }
+}
+
+function layoutFor(width, height) {
+  const padX = width * 0.06, padY = height * 0.08;
+  const availW = width - padX * 2, availH = height - padY * 2, aspect = 0.58;
+  let h = availH, w = h * aspect;
+  if (w > availW) { w = availW; h = w / aspect; }
+  return { ox: (width - w) / 2, oy: (height - h) / 2, w, h };
+}
+function toScreen(layout, x, y) { return { x: layout.ox + x * layout.w, y: layout.oy + y * layout.h }; }
+function makeGrain() {
+  const c = document.createElement("canvas"); c.width = 128; c.height = 128;
+  const ctx = c.getContext("2d"); const img = ctx.createImageData(128, 128);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = 90 + Math.random() * 80;
+    img.data[i] = v; img.data[i + 1] = v; img.data[i + 2] = v; img.data[i + 3] = 28 + Math.random() * 20;
+  }
+  ctx.putImageData(img, 0, 0); return c;
+}
+
+let audioBus = null;
+function ramp(param, value, time, at) {
+  param.cancelScheduledValues(at);
+  param.setValueAtTime(param.value, at);
+  param.setTargetAtTime(value, at, Math.max(0.01, time / 3));
+}
+function unlockAudio() {
+  if (!audioBus) {
+    const ctx = new AudioContext({ latencyHint: "interactive" });
+    const master = ctx.createGain(), music = ctx.createGain(), sfx = ctx.createGain();
+    const droneGain = ctx.createGain(), filter = ctx.createBiquadFilter();
+    master.gain.value = 0.85; music.gain.value = 0.7; sfx.gain.value = 0.8; droneGain.gain.value = 0;
+    filter.type = "lowpass"; filter.frequency.value = 140; filter.Q.value = 0.7;
+    droneGain.connect(filter); filter.connect(music); music.connect(master); sfx.connect(master); master.connect(ctx.destination);
+    const noise = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.35), ctx.sampleRate);
+    const data = noise.getChannelData(0); for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    audioBus = { ctx, master, music, sfx, droneGain, filter, noise, muted: false, started: false, heartbeat: null, presence: 0 };
+  }
+  if (audioBus.ctx.state === "suspended") audioBus.ctx.resume();
+  if (!audioBus.started) {
+    audioBus.started = true;
+    const now = audioBus.ctx.currentTime;
+    [[55, "sine", 0.55], [82.4, "sine", 0.35], [110, "triangle", 0.12], [164.8, "sine", 0.08]].forEach(([freq, type, gain]) => {
+      const osc = audioBus.ctx.createOscillator(), g = audioBus.ctx.createGain();
+      osc.type = type; osc.frequency.value = freq; g.gain.value = gain;
+      osc.connect(g); g.connect(audioBus.droneGain); osc.start(now);
+    });
+    ramp(audioBus.droneGain.gain, 0.045, 1.8, now);
+  }
+  if (audioBus.heartbeat == null) {
+    const beat = () => {
+      if (!audioBus || audioBus.muted) return;
+      const now = audioBus.ctx.currentTime, vol = 0.11 + audioBus.presence * 0.06;
+      const thump = (offset, freq, dur, v) => {
+        const osc = audioBus.ctx.createOscillator(), g = audioBus.ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, now + offset);
+        osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + offset + dur);
+        g.gain.setValueAtTime(0.0001, now + offset);
+        g.gain.exponentialRampToValueAtTime(v, now + offset + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + offset + dur);
+        osc.connect(g); g.connect(audioBus.sfx); osc.start(now + offset); osc.stop(now + offset + dur + 0.02);
+      };
+      thump(0, 64, 0.18, vol); thump(0.16, 92, 0.12, vol * 0.55);
+    };
+    beat(); audioBus.heartbeat = setInterval(beat, 1120);
+  }
+}
+function setMuted(m) {
+  if (!audioBus) return; audioBus.muted = m;
+  ramp(audioBus.master.gain, m ? 0 : 0.85, 0.08, audioBus.ctx.currentTime);
+}
+function setPresenceAudio(v) {
+  if (!audioBus) return; audioBus.presence = v;
+  ramp(audioBus.filter.frequency, 140 + v * 420, 0.4, audioBus.ctx.currentTime);
+  ramp(audioBus.droneGain.gain, 0.045 + v * 0.03, 0.4, audioBus.ctx.currentTime);
+}
+function playSpark() {
+  if (!audioBus || audioBus.muted) return;
+  const { ctx, sfx } = audioBus, now = ctx.currentTime, osc = ctx.createOscillator(), g = ctx.createGain();
+  const freq = 980 + Math.random() * 740;
+  osc.type = "sine"; osc.frequency.setValueAtTime(freq, now);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.12);
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.07, now + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+  osc.connect(g); g.connect(sfx); osc.start(now); osc.stop(now + 0.16);
+}
+function playGlitchSfx() {
+  if (!audioBus) return;
+  const { ctx, sfx, noise } = audioBus, now = ctx.currentTime;
+  const src = ctx.createBufferSource(); src.buffer = noise; src.playbackRate.value = 0.7;
+  const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 200;
+  const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 2400;
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.16, now + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+  src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(sfx); src.start(now); src.stop(now + 0.57);
+  ramp(audioBus.filter.frequency, 2400, 0.08, now);
+  ramp(audioBus.droneGain.gain, 0.12, 0.08, now);
+  ramp(audioBus.filter.frequency, 90, 1.6, now + 0.5);
+  ramp(audioBus.droneGain.gain, 0.07, 1.4, now + 0.5);
+}
+function playAwaken() {
+  if (!audioBus) return;
+  const { ctx, sfx } = audioBus, now = ctx.currentTime;
+  [220, 277.2, 329.6, 440].forEach((freq) => {
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = "sine"; osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.045, now + 0.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+    osc.connect(g); g.connect(sfx); osc.start(now); osc.stop(now + 3.4);
+  });
+}
+
+const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const canvas = document.getElementById("nervous");
+const wrap = document.getElementById("canvasWrap");
+const ctx = canvas.getContext("2d", { alpha: false });
+let sys = null, layout = { ox: 0, oy: 0, w: 1, h: 1 }, grain = null;
+let phase = "threshold", freePlay = false, muted = false, readySent = false;
+let time = 0, glitchAmt = 0, last = 0, running = false, lastClaimed = 0;
+
+function resize() {
+  const rect = wrap.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+  canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  canvas.style.width = rect.width + "px"; canvas.style.height = rect.height + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  layout = layoutFor(rect.width, rect.height);
+}
+function applyGlitch(intensity) {
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const w = canvas.width, h = canvas.height;
+  const slices = 6 + Math.floor(intensity * 10);
+  for (let i = 0; i < slices; i++) {
+    const y = Math.random() * h, hh = 4 + Math.random() * (18 + intensity * 40);
+    const shift = (Math.random() - 0.5) * 40 * intensity * (w / 400);
+    ctx.drawImage(canvas, 0, y, w, hh, shift, y, w, hh);
+  }
+  const split = 3 + intensity * 10 * Math.sin(time * 9);
+  ctx.globalCompositeOperation = "screen";
+  ctx.globalAlpha = 0.18 * intensity; ctx.drawImage(canvas, split, 0);
+  ctx.globalAlpha = 0.12 * intensity; ctx.drawImage(canvas, -split, 1);
+  ctx.restore();
+}
+function draw() {
+  const glowBoost = 0.55 + avgLit(sys) * 0.7;
+  ctx.save();
+  ctx.strokeStyle = rgba(FG, 0.045 + avgLit(sys) * 0.06); ctx.lineWidth = 1; ctx.beginPath();
+  const head = toScreen(layout, 0.5, 0.12);
+  ctx.ellipse(head.x, head.y, layout.w * 0.09, layout.h * 0.055, 0, 0, Math.PI * 2);
+  const neck = toScreen(layout, 0.5, 0.185), hip = toScreen(layout, 0.5, 0.56);
+  ctx.moveTo(neck.x, neck.y); ctx.lineTo(hip.x, hip.y);
+  const ls = toScreen(layout, 0.385, 0.25), lh = toScreen(layout, 0.14, 0.59);
+  const rs = toScreen(layout, 0.615, 0.25), rh = toScreen(layout, 0.86, 0.59);
+  ctx.moveTo(ls.x, ls.y); ctx.lineTo(lh.x, lh.y); ctx.moveTo(rs.x, rs.y); ctx.lineTo(rh.x, rh.y);
+  const ll = toScreen(layout, 0.43, 0.57), lf = toScreen(layout, 0.36, 0.95);
+  const rl = toScreen(layout, 0.57, 0.57), rf = toScreen(layout, 0.64, 0.95);
+  ctx.moveTo(ll.x, ll.y); ctx.lineTo(lf.x, lf.y); ctx.moveTo(rl.x, rl.y); ctx.lineTo(rf.x, rf.y);
+  ctx.stroke(); ctx.restore();
+
+  for (const e of sys.edges) {
+    const a = sys.nodes[e.a], b = sys.nodes[e.b];
+    const pa = toScreen(layout, a.x, a.y), pb = toScreen(layout, b.x, b.y);
+    ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = rgba(ACC, 0.05 + e.lit * 0.42); ctx.lineWidth = 0.7 + e.lit * 1.4; ctx.stroke();
+  }
+  for (const m of sys.motes) {
+    const p = toScreen(layout, m.x, m.y), fade = Math.sin((m.life / m.max) * Math.PI);
+    ctx.beginPath(); ctx.fillStyle = rgba(FG, 0.04 * fade); ctx.arc(p.x, p.y, m.size * 1.2, 0, Math.PI * 2); ctx.fill();
+  }
+  for (const n of sys.nodes) {
+    const p = toScreen(layout, n.x, n.y);
+    const breath = reduced ? 0 : Math.sin(n.breath + time * 1.4) * 0.35;
+    const r = (n.core ? 2.4 : 1.4) * n.radius + n.lit * 2.2 + n.flash * 3 + breath;
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 4.5);
+    const a = (0.04 + n.lit * 0.22 + n.flash * 0.35) * glowBoost;
+    g.addColorStop(0, rgba(GLOW, Math.min(0.9, a * 1.8)));
+    g.addColorStop(0.35, rgba(ACC, a * 0.45)); g.addColorStop(1, rgba(ACC, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r * 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.fillStyle = rgba(FG, 0.18 + n.lit * 0.72 + n.flash * 0.2);
+    ctx.arc(p.x, p.y, Math.max(0.7, r * 0.42), 0, Math.PI * 2); ctx.fill();
+  }
+  for (const s of sys.sparks) {
+    const pos = sparkPos(sys, s), p = toScreen(layout, pos.x, pos.y);
+    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 14);
+    g.addColorStop(0, rgba(FG, 0.95)); g.addColorStop(0.3, rgba(GLOW, 0.55)); g.addColorStop(1, rgba(ACC, 0));
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, 14, 0, Math.PI * 2); ctx.fill();
+  }
+  if (glitchAmt > 0.02 && !reduced) applyGlitch(glitchAmt);
+}
+
+function loop(now) {
+  if (!running) return;
+  const dt = Math.min((now - last) / 1000, 0.1); last = now; time += dt;
+  if (phase === "glitch") glitchAmt = Math.min(1, glitchAmt + dt * 0.7);
+  else glitchAmt = Math.max(0, glitchAmt - dt * (phase === "awakening" || freePlay ? 1.6 : 2.2));
+  step(sys, dt);
+  const p = presence(sys);
+  document.getElementById("bar").style.width = Math.min(100, p * 100) + "%";
+  if (sys.claimed.size !== lastClaimed) {
+    lastClaimed = sys.claimed.size;
+    const last = [...sys.claimed][sys.claimed.size - 1];
+    document.getElementById("hint").textContent =
+      last ? REGION_LABEL[last] :
+      (sys.claimed.size === 0 ? "Touch the body to inhabit it" :
+       sys.claimed.size < 3 ? "Travel the path" :
+       sys.claimed.size < 5 ? "The original error is forming" : "Hold the signal");
+  }
+  setPresenceAudio(p);
+  if (phase === "inhabit" && !freePlay && awakeningReady(sys) && !readySent) {
+    readySent = true; startGlitch();
+  }
+  const shake = reduced || sys.trauma < 0.01 ? 0 : sys.trauma * sys.trauma * 7;
+  const vw = wrap.clientWidth, vh = wrap.clientHeight;
+  ctx.fillStyle = "#08080a"; ctx.fillRect(0, 0, vw, vh);
+  ctx.save(); ctx.translate(shake ? (Math.random() - 0.5) * shake : 0, shake ? (Math.random() - 0.5) * shake : 0);
+  draw(); ctx.restore();
+  if (grain) {
+    ctx.save(); ctx.globalAlpha = 0.045 + glitchAmt * 0.08;
+    const pat = ctx.createPattern(grain, "repeat");
+    if (pat) { ctx.fillStyle = pat; ctx.fillRect(0, 0, vw, vh); }
+    ctx.restore();
+  }
+  const vg = ctx.createRadialGradient(vw / 2, vh / 2, Math.min(vw, vh) * 0.2, vw / 2, vh / 2, Math.max(vw, vh) * 0.72);
+  vg.addColorStop(0, "rgba(8,8,10,0)"); vg.addColorStop(1, "rgba(8,8,10,0.72)");
+  ctx.fillStyle = vg; ctx.fillRect(0, 0, vw, vh);
+  requestAnimationFrame(loop);
+}
+
+function show(id) {
+  ["threshold", "inhabitHud", "glitchVeil", "awakening"].forEach((k) => {
+    document.getElementById(k).classList.toggle("hidden", k !== id);
+  });
+  wrap.classList.toggle("hidden", id === "threshold");
+}
+
+function enter() {
+  unlockAudio();
+  sys = createSystem(7); grain = makeGrain(); readySent = false; lastClaimed = 0; freePlay = false;
+  phase = "inhabit"; show("inhabitHud");
+  document.getElementById("freeLabel").classList.add("hidden");
+  document.getElementById("hint").textContent = "Touch the body to inhabit it";
+  document.getElementById("bar").style.width = "0%";
+  wrap.classList.remove("hidden"); resize();
+  last = performance.now(); running = true; requestAnimationFrame(loop);
+}
+function startGlitch() {
+  phase = "glitch"; show("glitchVeil"); wrap.classList.remove("hidden"); playGlitchSfx();
+  igniteAll(sys);
+  setTimeout(() => {
+    phase = "awakening"; show("awakening"); wrap.classList.remove("hidden");
+    playAwaken();
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ awakened: true })); } catch (e) {}
+  }, reduced ? 900 : 2600);
+}
+
+try {
+  const save = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}");
+  if (save.awakened) document.getElementById("enterLabel").textContent = "Return";
+} catch (e) {}
+
+document.getElementById("enter").addEventListener("click", enter);
+document.getElementById("remain").addEventListener("click", () => {
+  freePlay = true; phase = "inhabit"; igniteAll(sys);
+  show("inhabitHud"); wrap.classList.remove("hidden");
+  document.getElementById("freeLabel").classList.remove("hidden");
+  document.getElementById("hint").textContent = "Hold the signal";
+  document.getElementById("bar").style.width = "100%";
+});
+document.getElementById("again").addEventListener("click", () => {
+  running = false; phase = "threshold"; freePlay = false; readySent = false;
+  show("threshold");
+});
+document.getElementById("mute").addEventListener("click", () => {
+  unlockAudio(); muted = !muted; setMuted(muted);
+  document.getElementById("iconOn").classList.toggle("hidden", muted);
+  document.getElementById("iconOff").classList.toggle("hidden", !muted);
+  document.getElementById("mute").setAttribute("aria-label", muted ? "Unmute" : "Mute");
+});
+canvas.addEventListener("pointerdown", (ev) => {
+  if (phase === "threshold") return;
+  const rect = canvas.getBoundingClientRect();
+  const x = (ev.clientX - rect.left - layout.ox) / layout.w;
+  const y = (ev.clientY - rect.top - layout.oy) / layout.h;
+  if (igniteAt(sys, x, y)) playSpark();
+});
+window.addEventListener("resize", () => { if (!wrap.classList.contains("hidden")) resize(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && audioBus && audioBus.ctx.state === "suspended") audioBus.ctx.resume();
+});
+new ResizeObserver(() => { if (!wrap.classList.contains("hidden")) resize(); }).observe(wrap);
+</script>
+</body>
+</html>
